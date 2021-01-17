@@ -3,7 +3,7 @@ import pandas as pd
 from mido import MidiFile
 import pypianoroll as pypi
 
-
+# Recibe un track (de Mido) y retorna la familia de instrumentos de este.
 def get_track_instrument(track):
 	instr = "None?"
 	for msg in track:
@@ -71,6 +71,7 @@ def get_track_instrument(track):
 
 	return instr
 
+# Obtiene los tracks validos (ya no se usa mucho).
 def get_num_valid_instr(mid):
 	validInstr = ["drums", "bass", "ensemble", "brass", "strings"]
 	
@@ -88,10 +89,14 @@ def get_num_valid_instr(mid):
 
 	return numValid, numUnique
 
-
+# Combina los tracks de un multitrack (pypianoroll) para generar un nuevo multitrack
+# conformado de 5 tracks de las 5 familias de instrumentos escogidas.
 def merge_tracks(multitrack):
+	# Familia de instrumentos escogidas.
 	trackInfo = (("Drums", 0), ("Bass", 33), ("Brass", 56), ("Piano", 0), ("Ensemble", 48),)
 	tracksToMerge = [[], [], [], [], []]
+	# Observamos a que familia de instrumentos pertenece cada track de la cancion
+	# original.
 	for i, track in enumerate(multitrack.tracks):
 		if track.is_drum:
 			tracksToMerge[0].append(i)
@@ -106,7 +111,9 @@ def merge_tracks(multitrack):
 
 	tracks = []
 
+	# Una vez que asignamos los tracks a mezclarse, los recorremos, mezclandolos.
 	for i, trackList in enumerate(tracksToMerge):
+		# Si hay tracks que se pueden mezclar.
 		if trackList:
 			newTracks = []
 			for trackIndex in trackList:
@@ -114,8 +121,10 @@ def merge_tracks(multitrack):
 			auxM = pypi.Multitrack(tracks=newTracks, tempo=multitrack.tempo, downbeat=multitrack.downbeat, resolution=multitrack.resolution)
 			merged = auxM.blend("max")
 			tracks.append(pypi.Track(pianoroll=merged, program=trackInfo[i][1], is_drum=(i == 0), name=trackInfo[i][0]).standardize().binarize())
+		# Si no hay tracks, se genera un track vacio.
 		else:
 			tracks.append(pypi.Track(pianoroll=None, program=trackInfo[i][1], is_drum=(i == 0), name=trackInfo[i][0]).standardize().binarize())
+	# Multitrack con los 5 tracks a utilizar.
 	m = pypi.Multitrack(tracks=tracks, tempo=multitrack.tempo[0], downbeat=multitrack.downbeat, resolution=multitrack.resolution, name=multitrack.name)
 	return m
 
