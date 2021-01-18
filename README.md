@@ -4,6 +4,8 @@
 
 This is a replica of MuseGAN, a Deep Learning model to generate multitrack music. We trained this model using video game music and using Pytorch.
 
+Original work by: https://github.com/salu133445
+
 Follow this [link](https://github.com/salu133445/musegan) to the original content. 
 
 You can find more video game music at https://www.vgmusic.com/
